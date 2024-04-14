@@ -1,23 +1,43 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
+import ImageCard from './components/imagecard';
+import ImageSearch from './components/imagesearch';
 
 function App() {
+
+  const [images , setImages] = useState([]);
+  const [loading , setLoading] = useState(true);
+  const [term, setTerm] = useState("");
+
+  useEffect(()=>{
+    fetch(`https://pixabay.com/api/?key=${process.env.REACT_APP_PIXABAY_API_KEY}&q=${term}_type=photo
+    `)
+    .then(res => res.json())
+    .then(data=> {setImages(data.hits);
+      setLoading(false);}
+    )
+    .catch(err=> console.log(err));
+  },[term])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+
+    <div className='container mx-auto'>
+
+      <ImageSearch searchText = {(text) => setTerm(text) }/>
+
+
+  { loading ? <h1>Loading..</h1> : 
+  <div className='grid grid-cols-3 gap-4'>
+  {
+    images.map ((image , index) =>(
+      <ImageCard key={index} image={image}/> 
+    ))
+   
+  }
+   </div>
+}
+
+
     </div>
   );
 }
